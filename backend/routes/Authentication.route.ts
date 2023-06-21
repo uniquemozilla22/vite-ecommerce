@@ -1,14 +1,36 @@
 import express from "express";
 import { createUser } from "../Controller/UserController";
-import { IUser } from "../database/Schema/User.schema";
-import { encryptPassword } from "../services/passwordManager.services";
+import { IUser, User } from "../database/Schema/User.schema";
+import {
+  comparePassword,
+  encryptPassword,
+} from "../services/passwordManager.services";
+import { createToken } from "../services/jwt.services";
 
 const AuthenticationRoute = express.Router();
 
-AuthenticationRoute.post("/login", (req, res) => {
-  const { username, password } = req.body;
+AuthenticationRoute.post("/login", async (req, res) => {
+  const { email, username, password } = req.body;
 
-  res.send({ username, password, status: "login successfull" });
+  let user;
+  if (email) {
+    user = await User.findOne({ email });
+  } else if (username) {
+    user = await User.findOne({ username });
+  } else {
+    user = null;
+    res.send({ status: "Login Needs a email or a username" });
+    return;
+  }
+
+  if (user) {
+    const doesPasswordMatch = await comparePassword(password, user.password);
+    if (doesPasswordMatch) {
+      res.send({ token: createToken(user), status: "login successfull" });
+    } else {
+      res.send({ status: "Login failed Password dont match" });
+    }
+  }
 });
 
 AuthenticationRoute.post("/register", async (req, res) => {

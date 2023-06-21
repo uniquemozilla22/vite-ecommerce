@@ -15,3 +15,15 @@ export const encryptPassword = async (
     return;
   }
 };
+
+export const comparePassword = async (
+  password: string,
+  hashedPassword: string
+): Promise<boolean> => {
+  const comparison = await bcrypt.compare(password, hashedPassword);
+  console.log(comparison);
+  if (comparison) {
+    return true;
+  }
+  return false;
+};
