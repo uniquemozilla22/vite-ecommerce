@@ -12,12 +12,12 @@ AuthenticationRoute.post("/login", (req, res) => {
 });
 
 AuthenticationRoute.post("/register", async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, email } = req.body;
 
   const hashedPassword: string | undefined = await encryptPassword(password);
 
   if (hashedPassword) {
-    const user: IUser = createUser(username, hashedPassword);
+    const user: IUser = await createUser(username, hashedPassword, email);
     res.send({ username, password, status: "registered", user });
   } else {
     res.send({ status: "Rejected register" });
