@@ -1,7 +1,8 @@
 {
     "watch": [
         "src",
-        "backend"
+        "backend",
+        "./"
     ],
     "ext": "ts,json",
     "ignore": [

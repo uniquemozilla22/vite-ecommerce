@@ -1,6 +1,7 @@
 import express from "express";
 import { createUser } from "../Controller/UserController";
 import { IUser } from "../database/Schema/User.schema";
+import { encryptPassword } from "../services/passwordManager.services";
 
 const AuthenticationRoute = express.Router();
 
@@ -10,12 +11,17 @@ AuthenticationRoute.post("/login", (req, res) => {
   res.send({ username, password, status: "login successfull" });
 });
 
-AuthenticationRoute.post("/register", (req, res) => {
+AuthenticationRoute.post("/register", async (req, res) => {
   const { username, password } = req.body;
 
-  const user: IUser = createUser(username, password);
+  const hashedPassword: string | undefined = await encryptPassword(password);
 
-  res.send({ username, password, status: "registered", user });
+  if (hashedPassword) {
+    const user: IUser = createUser(username, hashedPassword);
+    res.send({ username, password, status: "registered", user });
+  } else {
+    res.send({ status: "Rejected register" });
+  }
 });
 
 export default AuthenticationRoute;
