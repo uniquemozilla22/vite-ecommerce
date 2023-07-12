@@ -9,6 +9,10 @@ import { createToken } from "../services/jwt.services";
 
 const AuthenticationRoute = express.Router();
 
+AuthenticationRoute.get("/user", (_req, res) => {
+  res.send("<h1>I am certainly not forgetting about my students </h1>");
+});
+
 AuthenticationRoute.post("/login", async (req, res) => {
   const { email, username, password } = req.body;
 
